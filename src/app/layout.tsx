@@ -2,13 +2,6 @@ import React from 'react'
 
 // ------------------------------------------------------------
 
-export const metadata = {
-  title: 'Table | Students',
-  description: 'Table Students',
-}
-
-// ------------------------------------------------------------
-
 import './globals.scss'
 import styles from './layout.module.scss'
 
