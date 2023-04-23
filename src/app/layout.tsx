@@ -1,5 +1,4 @@
 import React from 'react'
-import { Montserrat } from 'next/font/google'
 
 // ------------------------------------------------------------
 
@@ -15,11 +14,6 @@ import styles from './layout.module.scss'
 
 // ------------------------------------------------------------
 
-const montserrat = Montserrat({
-  weight: '400',
-  subsets: ['latin'],
-})
-
 export default function RootLayout({
   children,
 }: {
@@ -27,7 +21,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={[`${montserrat.className}`].join(' ')}>
+      <body>
         <div className={styles.wrapper}>
           <main className={styles.main}>
             {children}
