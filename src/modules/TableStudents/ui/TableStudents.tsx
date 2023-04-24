@@ -32,6 +32,7 @@ export default function TableStudents() {
   const [viewProgressIds, setViewProgressIds] = React.useState<Array<number>>([])
   const [editModeProgressIds, setEditModeProgressIds] = React.useState<Array<number>>([])
   const editModeInputsRef = React.useRef<HTMLInputElement[]>([])
+  const [currentInputId, setCurrentInputId] = React.useState<number | null>(null)
 
   React.useEffect(() => {
     const getStudents = async () => {
@@ -42,6 +43,10 @@ export default function TableStudents() {
     }
     getStudents()
   }, [])
+
+  React.useEffect(() => {
+    currentInputId && editModeInputsRef.current[currentInputId].focus()
+  }, [currentInputId])
 
   const handleUpdateProcess = (id: number) => {
     setStudents(prev => prev.map(student => student.id === id
@@ -54,6 +59,7 @@ export default function TableStudents() {
       : student
     ))
     setEditModeProgressIds(prev => prev.filter(progressId => progressId !== id))
+    setCurrentInputId(null)
   }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, id: number) => {
@@ -63,9 +69,12 @@ export default function TableStudents() {
   }
 
   const handleEditModeProgressIds = (id: number) => {
-    editModeProgressIds.find(progressId => progressId === id)
-      ? setEditModeProgressIds(prev => prev.filter(progressId => progressId !== id))
-      : setEditModeProgressIds(prev => [...prev, id])
+    if (editModeProgressIds.find(progressId => progressId === id)) {
+      setEditModeProgressIds(editModeProgressIds.filter(progressId => progressId !== id))
+    } else {
+      setEditModeProgressIds([...editModeProgressIds, id])
+      setCurrentInputId(id)
+    }
   }
 
   const handleViewProcessIds = (id: number) => {
@@ -146,8 +155,6 @@ export default function TableStudents() {
       ? `${styles.progress} ${styles.active}`
       : styles.progress
   }
-
-  console.log(editModeInputsRef)
   return (
     <ErrorBoundary>
       <div className={[`${styles.tableStudents}`, 'container'].join(' ')}>
@@ -186,7 +193,6 @@ export default function TableStudents() {
                       <tr {...row.getRowProps()} key={row.getRowProps().key}>
                         {row.cells.map(cell => (
                           <td {...cell.getCellProps()} key={cell.getCellProps().key}
-                            onClick={() => console.log(cell.row)}
                             className={[
                               `${cell.column.id === 'progress' ? visibleProcess(Number(cell.row.id) + 1) : ''}`,
                             ].join(' ')}
@@ -201,7 +207,7 @@ export default function TableStudents() {
                                     maxLength={3}
                                     defaultValue={cell.value}
                                     onBlur={() => handleUpdateProcess(Number(cell.row.id) + 1)}
-                                    onKeyDown={(event) => handleKeyDown(event, Number(cell.row.id) + 1)}
+                                    onKeyDown={event => handleKeyDown(event, Number(cell.row.id) + 1)}
                                     ref={element => editModeInputsRef.current[Number(cell.row.id) + 1] = element as HTMLInputElement}
                                   />
                                   : cell.render('Cell')
